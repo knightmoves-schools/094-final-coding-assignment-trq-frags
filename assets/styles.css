@@ -1,0 +1,108 @@
+/* Modern store styles - responsive, simple, and cool */
+:root{
+  --bg:#0f1724;
+  --card:#0b1220;
+  --accent:#7c5cff;
+  --muted:#94a3b8;
+  --glass: rgba(255,255,255,0.04);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;background:linear-gradient(180deg,var(--bg),#071023);color:#e6eef8}
+.container{max-width:1100px;margin:32px auto;padding:24px}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo .mark{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#3dd5ff);display:flex;align-items:center;justify-content:center;font-weight:700;color:#07203a}
+.cta{background:linear-gradient(90deg,var(--accent),#3dd5ff);border:none;padding:10px 16px;border-radius:10px;color:#071023;font-weight:600;cursor:pointer}
+.hero{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:center;margin-top:28px}
+.hero .copy h1{font-size:2.2rem;margin:0 0 12px}
+.hero .copy p{color:var(--muted);margin:0 0 18px}
+.searchbar{display:flex;gap:8px;background:var(--glass);padding:8px;border-radius:12px}
+.searchbar input{flex:1;border:0;background:transparent;color:inherit;padding:8px;outline:none}
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.03),transparent);border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.04)}
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;margin-top:22px}
+.product{border-radius:12px;padding:14px;background:linear-gradient(180deg,var(--card),#071021);box-shadow:0 6px 18px rgba(10,12,18,0.6);display:flex;flex-direction:column}
+.product img{width:100%;height:140px;object-fit:cover;border-radius:8px}
+.product .meta{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+.price{font-weight:700;color:var(--accent)}
+.add-btn{background:transparent;border:1px dashed rgba(255,255,255,0.06);padding:8px;border-radius:10px;color:var(--muted);cursor:pointer}
+.cart{position:fixed;right:20px;bottom:20px;width:340px;max-width:90%;backdrop-filter:blur(8px);background:linear-gradient(180deg,rgba(12,14,20,0.6),rgba(8,10,14,0.45));padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,0.04)}
+.cart h3{margin:0 0 8px}
+.cart-list{max-height:260px;overflow:auto;margin:8px 0}
+.cart-item{display:flex;gap:8px;align-items:center;padding:8px;border-radius:8px}
+.cart-item img{width:48px;height:48px;object-fit:cover;border-radius:6px}
+.cart-item .grow{flex:1}
+.cart-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.ghost{opacity:0.65}
+.small{font-size:0.9rem}
+.center{display:flex;align-items:center;justify-content:center}
+@media(max-width:880px){.hero{grid-template-columns:1fr;}.nav{flex-direction:column;align-items:flex-start}.cart{right:12px;left:12px}} 
+
+/* Inline variant of the cart for dashboard previews (not fixed) */
+.cart.inline{
+  position:static;
+  right:auto;
+  bottom:auto;
+  width:100%;
+  max-width:100%;
+  backdrop-filter: none;
+  background: linear-gradient(180deg, rgba(12,14,20,0.65), rgba(8,10,14,0.55));
+  padding:14px;
+  border-radius:12px;
+  box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+  margin-top:12px;
+}
+.cart.inline .cart-list{max-height:300px}
+.cart.inline .cart-footer{margin-top:12px}
+
+/* Modal styles */
+.modal-backdrop{position:fixed;inset:0;background:rgba(1,2,6,0.6);display:flex;align-items:center;justify-content:center;z-index:1200;opacity:0;pointer-events:none;transition:opacity .18s ease}
+.modal-backdrop.show{opacity:1;pointer-events:auto}
+.modal{background:var(--card);border-radius:12px;padding:18px;max-width:540px;width:92%;border:1px solid rgba(255,255,255,0.06);box-shadow:0 18px 48px rgba(2,6,23,0.8)}
+.modal h4{margin:0 0 8px}
+.modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.modal .danger{background:#ff6b6b;color:#071021;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+.modal .muted{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px 12px;border-radius:8px;cursor:pointer}
+
+/* Product detail specific */
+.product-modal .meta{display:flex;gap:12px;align-items:flex-start}
+.product-modal img{width:160px;height:120px;object-fit:cover;border-radius:8px}
+.product-modal .options{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+.product-modal .option{padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);cursor:pointer}
+
+/* Variant / option buttons (product pages) */
+.option{
+  display:inline-flex;align-items:center;gap:8px;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);
+  background:linear-gradient(90deg,rgba(255,255,255,0.02),transparent);cursor:pointer;font-weight:700;
+  transition:transform .12s ease, box-shadow .12s ease, background-color .12s ease, color .12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.option .vlabel{color:var(--accent);margin-right:6px;transition:color .12s ease}
+.option .vprice{font-weight:600;color:#dbeafe;transition:color .12s ease}
+.option.selected{
+  /* stronger, higher-contrast selected state */
+  background: linear-gradient(90deg, #ffd57a, var(--accent));
+  color: #071021 !important;
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: 0 10px 30px rgba(124,92,255,0.25), 0 2px 6px rgba(0,0,0,0.35);
+}
+.option.selected .vlabel { color: #071021 !important }
+.option.selected .vprice { color: #071021 !important }
+.option:hover{transform:translateY(-2px)}
+
+/* Focus and active states for accessibility and pressed appearance */
+.option:focus{outline: none; box-shadow: 0 0 0 4px rgba(124,92,255,0.12)}
+.option:active{transform:translateY(0); box-shadow: 0 6px 18px rgba(0,0,0,0.35);} 
+
+/* Invalid input state for JS-driven validation */
+.invalid{border-color:#ff6b6b !important;box-shadow:0 0 0 3px rgba(255,107,107,0.08) !important}
+.invalid::placeholder{color:#ffb3b3}
+
+/* Valid input state */
+.valid{border-color:#2dd4bf !important;box-shadow:0 0 0 3px rgba(45,212,191,0.06) !important}
+.valid::placeholder{color:#bff6eb}
+
+/* Smooth transitions for input state changes */
+input{transition:box-shadow .12s ease,border-color .12s ease}
+
+
+

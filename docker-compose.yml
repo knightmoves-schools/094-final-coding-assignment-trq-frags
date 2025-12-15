@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  email-server:
+    build: ./server
+    image: website-base-code-email
+    ports:
+      - "3010:3010"
+    environment:
+      - PORT=3010
+      # For real SMTP, set these environment variables in a .env file or your deployment
+      # - SMTP_HOST=smtp.example.com
+      # - SMTP_PORT=587
+      # - SMTP_SECURE=false
+      # - SMTP_USER=your_user
+      # - SMTP_PASS=your_pass
+      # - EMAIL_FROM="Cloud Alts <no-reply@example.com>"
+    restart: unless-stopped

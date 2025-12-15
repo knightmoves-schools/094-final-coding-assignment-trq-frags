@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Minecraft Account — Cloud Alts</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <div class="container">
+    <header style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+  <a href="/Webpages/webpage3.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit">
+        <div class="mark">CS</div>
+        <div>
+          <div style="font-weight:700">Cloud Alts</div>
+          <div class="small ghost">Back to store</div>
+        </div>
+      </a>
+    </header>
+    <main class="card">
+      <h1>Minecraft Account</h1>
+      <p class="small ghost">Premium account details.</p>
+      <img src="https://images.unsplash.com/photo-1541807084-5c52b6bfdgdfgdfg6b7f4?w=800&q=60" style="width:100%;max-width:520px;margin-top:12px;border-radius:8px;" alt="Minecraft">
+      <div style="margin-top:12px">
+        <label class="small ghost">Choose variant:</label>
+        <div style="display:flex;gap:8px;margin-top:8px" id="variantOptions">
+          <button class="option" data-variant="NFA" data-price="3.50"><span class="vlabel">NFA</span><span class="vprice">$3.50</span></button>
+          <button class="option" data-variant="MFA" data-price="4.50"><span class="vlabel">MFA</span><span class="vprice">$4.50</span></button>
+          <button class="option" data-variant="FA" data-price="6.99"><span class="vlabel">FA</span><span class="vprice">$6.99</span></button>
+          <button class="option" data-variant="TFA" data-price="9.99"><span class="vlabel">TFA</span><span class="vprice">$9.99</span></button>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button id="addMinecraft" class="cta">Add to cart</button>
+          <a href="/Webpages/webpage3.html" class="add-btn">Back to store</a>
+        </div>
+        <div style="margin-top:18px">
+          <div class="card">
+            <h4>Your cart</h4>
+            <div id="cartList" class="cart-list"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+              <div class="small ghost">Total</div>
+              <div class="price" id="cartTotal">$0.00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="/assets/scripts.js"></script>
+  <script>
+    // variant selection logic with prices and on-page cart
+    (function(){
+      const opts = Array.from(document.querySelectorAll('#variantOptions .option'))
+      let selected = opts[0] && opts[0].dataset.variant
+      let selectedPrice = opts[0] && Number(opts[0].dataset.price)
+      function updateSelection(b){ opts.forEach(x=>x.classList.remove('selected')); b.classList.add('selected'); selected = b.dataset.variant; selectedPrice = Number(b.dataset.price) }
+      opts.forEach(b=>b.addEventListener('click',()=>{ updateSelection(b) }))
+      if(opts[0]) updateSelection(opts[0])
+      const addBtn = document.getElementById('addMinecraft')
+      addBtn.addEventListener('click',()=>{
+        const product = { id:'p-minecraft', name:`Minecraft Account (${selected})`, price:selectedPrice||4.50, description:`Minecraft account - ${selected}`, image:'https://images.unsplash.com/photo-1541807084-5c52b6bfdgdfgdfg6b7f4?w=800&q=60', variant:selected }
+        if(window.addToCart) addToCart(product); else alert('Cart not available')
+        addBtn.textContent='Added ✓'
+        setTimeout(()=>addBtn.textContent='Add to cart',900)
+      })
+      // render cart on this page if scripts provided renderCart
+      if(window.renderCart) renderCart();
+    })()
+  </script>
+</body>
+</html>

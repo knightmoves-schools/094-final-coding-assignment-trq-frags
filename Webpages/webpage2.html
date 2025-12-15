@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Customer Login — Cloud Alts</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+  </head>
+  <body>
+    <div class="container">
+      <div style="max-width:540px;margin:40px auto">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div>
+              <h2>Customer area</h2>
+              <div class="small ghost">Login or register to manage orders</div>
+            </div>
+            <a href="./webpage3.html" class="add-btn">Back to store</a>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <form id="loginForm">
+              <h3>Login</h3>
+              <label class="small">Email</label>
+              <input id="loginEmail" required placeholder="you@example.com" style="width:100%;padding:8px;margin:6px 0;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+              <label class="small">Password</label>
+              <input id="loginPass" type="password" required style="width:100%;padding:8px;margin:6px 0;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+              <div style="margin-top:8px;display:flex;gap:8px">
+                <button type="submit" class="cta">Login</button>
+              </div>
+              <div id="loginMsg" class="small ghost" style="margin-top:8px"></div>
+            </form>
+
+            <form id="regForm">
+              <h3>Register</h3>
+              <label class="small">Email</label>
+              <input id="regEmail" required placeholder="you@example.com" style="width:100%;padding:8px;margin:6px 0;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+              <label class="small">Password</label>
+              <input id="regPass" type="password" required style="width:100%;padding:8px;margin:6px 0;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+              <div style="margin-top:8px;display:flex;gap:8px">
+                <button type="submit" class="cta">Register</button>
+              </div>
+              <div id="regMsg" class="small ghost" style="margin-top:8px"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/assets/auth.js"></script>
+    <script>
+      const loginForm = document.getElementById('loginForm')
+      const regForm = document.getElementById('regForm')
+      loginForm.addEventListener('submit',e=>{
+        e.preventDefault(); const email = document.getElementById('loginEmail').value; const pass = document.getElementById('loginPass').value;
+        const res = loginUser(email,pass)
+        const m = document.getElementById('loginMsg')
+        if(res.ok){ m.textContent='Logged in — redirecting...'; setTimeout(()=>location.href='/customers/dashboard.html',700) } else { m.textContent=res.error }
+      })
+      regForm.addEventListener('submit',e=>{
+        e.preventDefault(); const email = document.getElementById('regEmail').value; const pass = document.getElementById('regPass').value;
+        const res = registerUser(email,pass)
+        const m = document.getElementById('regMsg')
+        if(res.ok){ m.textContent='Registered — redirecting...'; setTimeout(()=>location.href='/customers/dashboard.html',700) } else { m.textContent=res.error }
+      })
+    </script>
+  </body>
+</html>
+        <html>
+    <head>
+    <style>
+        .myDiv {
+            border: 5px outside darkred;
+            background-color: black;
+            text-align: center;
+        }
+    </style>    
+        
+    </head>
+  <form action="/Webpages/webpage.html?">
+            <label for="email">Email:</label>
+            <input type="text" id="emale" name="Roblox" required><br>
+            <label for="pass">Password:</label>
+            <input type="text" id="pass" name="Help" required><br>
+            <input type="submit" value="Login">
+        </form>
+
+
+    </div>
+
+</html>

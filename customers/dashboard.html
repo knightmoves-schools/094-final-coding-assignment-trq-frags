@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Dashboard — Cloud Alts</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <div class="container">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+  <a href="/Webpages/webpage3.html" class="add-btn">Back to store</a>
+      <div>
+        <button id="logoutBtn" class="add-btn">Logout</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Customer Dashboard</h2>
+      <div id="userInfo" class="small ghost" style="margin-bottom:12px"></div>
+      <h4>Your cart preview</h4>
+      <div class="cart inline">
+        <div id="cartList" class="cart-list"></div>
+        <div class="cart-footer">
+          <div class="small ghost">Total</div>
+          <div class="price" id="cartTotal">$0.00</div>
+        </div>
+      </div>
+    </div>
+    
+    <div style="margin-top:18px" class="card">
+      <h3>Order history</h3>
+      <div id="ordersList" style="margin-top:8px"></div>
+      <div id="ordersEmpty" class="small ghost" style="margin-top:8px">No orders yet</div>
+    </div>
+  </div>
+
+  <script src="/assets/auth.js"></script>
+  <script src="/assets/pay.js"></script>
+  <script src="/assets/scripts.js"></script>
+  <script>
+    // require auth (redirects to login if not authed)
+  requireAuth('/Webpages/webpage2.html')
+    const user = currentUser();
+    document.getElementById('userInfo').textContent = user? 'Logged in as: ' + user.email : 'Not logged in'
+  document.getElementById('logoutBtn').addEventListener('click',()=>{ logout(); location.href='/Webpages/webpage2.html' })
+    // render cart
+    document.addEventListener('DOMContentLoaded',()=>{ if(window.renderCart) renderCart() })
+    // render orders
+    function renderOrders(){
+      const all = (function(){try{return JSON.parse(localStorage.getItem('demo_orders_v1'))||[]}catch(e){return []}})()
+      const current = (function(){try{return JSON.parse(localStorage.getItem('demo_session_v1'))||null}catch(e){return null}})()
+      const orders = current ? all.filter(o=>o.userEmail===current.email) : []
+      const container = document.getElementById('ordersList')
+      const empty = document.getElementById('ordersEmpty')
+      container.innerHTML = ''
+      if(!orders.length){ empty.style.display='block'; return }
+      empty.style.display='none'
+      orders.slice().reverse().forEach(o=>{
+        const el = document.createElement('div'); el.style.borderTop='1px solid rgba(255,255,255,0.03)'; el.style.padding='10px 0'
+        el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>Order ${o.id}</strong><div class='small ghost'>${new Date(o.created).toLocaleString()}</div></div><div style="display:flex;gap:8px"><div class='small ghost'>$${(o.amount||0).toFixed(2)}</div><button class='add-btn' data-download='${o.id}'>Download</button><a class='add-btn' href='/customers/receipt.html?id=${o.id}'>View receipt</a></div></div>`
+        const btn = el.querySelector('button[data-download]')
+        btn.addEventListener('click',()=>{
+          const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(o,null,2))
+          const a = document.createElement('a'); a.href = dataStr; a.download = `${o.id}.json`; document.body.appendChild(a); a.click(); a.remove();
+        })
+        // show items preview
+        const itemsPre = document.createElement('div'); itemsPre.className='small ghost'; itemsPre.style.marginTop='8px'
+        itemsPre.textContent = (o.items||[]).map(i=>`${i.name}${i.variant? ' ('+i.variant+')':''} — $${(i.price||0).toFixed(2)}`).join(' | ')
+        el.appendChild(itemsPre)
+        container.appendChild(el)
+      })
+    }
+    document.addEventListener('DOMContentLoaded',()=>{ renderOrders() })
+  </script>
+</body>
+</html>

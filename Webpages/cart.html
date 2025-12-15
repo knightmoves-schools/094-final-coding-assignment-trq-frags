@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Cart – Cloud Alts</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+  </head>
+  <body>
+    <div class="container">
+      <nav class="nav">
+        <div class="logo">
+          <a href="/Webpages/webpage3.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit">
+            <div class="mark">CS</div>
+            <div>
+              <div style="font-weight:700">Cloud Alts</div>
+              <div class="small ghost">Quality digital alts</div>
+            </div>
+          </a>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="searchbar card">
+            <input id="search" placeholder="Search products…" />
+            <button class="add-btn">🔍</button>
+          </div>
+          <a class="add-btn" href="/customers/dashboard.html">Dashboard</a>
+          <a class="cta" href="/Webpages/cart.html">Cart</a>
+        </div>
+      </nav>
+
+      <section class="hero" style="grid-template-columns: 1fr;">
+        <div class="copy" style="width:100%">
+          <h1>Your Cart</h1>
+          <p class="small ghost">Review your items and proceed to payment.</p>
+          <div style="margin-top:12px">
+            <div class="cart inline" aria-hidden="false" style="background:transparent;border:none;padding:0;position:static">
+              <div id="cartList" class="cart-list" style="gap:12px"></div>
+              <div class="cart-footer" style="margin-top:12px">
+                <div class="small ghost">Total</div>
+                <div class="price" id="cartTotal">$0.00</div>
+              </div>
+              <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+                <button class="cta" id="proceedPay">Proceed to Payment</button>
+                <a class="add-btn" href="/Webpages/webpage3.html">Back to Shop</a>
+                <button class="add-btn" onclick="showClearConfirm()">Empty</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Clear confirmation modal -->
+      <div id="modalClear" class="modal-backdrop" aria-hidden="true">
+        <div class="modal">
+          <h4>Clear cart?</h4>
+          <p class="small ghost">This will remove all items from your cart. This action cannot be undone.</p>
+          <div class="actions">
+            <button class="muted" onclick="hideModal()">Cancel</button>
+            <button class="danger" onclick="clearCart();hideModal()">Clear cart</button>
+          </div>
+        </div>
+      </div>
+
+      <footer style="margin-top:28px;border-top:1px solid rgba(255,255,255,0.03);padding-top:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="small ghost">Made with care and protected by trqanti-ddos</div>
+          <div>
+            <a class="small" href="https://github.com/trq-frags/website-base-code">View repo</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script src="/assets/scripts.js"></script>
+    <script>
+      // Override renderCart on cart page to show quantities and controls
+      window.renderCart = function(){
+        function load(){ try { return JSON.parse(localStorage.getItem('store_cart_v1'))||[] } catch(e){ return [] } }
+        function save(c){ localStorage.setItem('store_cart_v1', JSON.stringify(c)); document.dispatchEvent(new CustomEvent('cart:updated')); }
+        const list = document.getElementById('cartList'); if(!list) return;
+        const cart = load();
+        list.innerHTML = '';
+        if(cart.length===0){ list.innerHTML = '<div class="small ghost center">Your cart is empty</div>'; document.getElementById('cartTotal').textContent = '$0.00'; return; }
+        // group by id+variant+name
+        const groups = {};
+        cart.forEach((it,idx)=>{
+          const key = `${it.id}|${it.variant||''}|${it.name}`;
+          if(!groups[key]) groups[key] = {item: it, indices: []};
+          groups[key].indices.push(idx);
+        });
+        let total = 0;
+        Object.values(groups).forEach(g=>{
+          const it = g.item; const qty = g.indices.length; total += (it.price||0)*qty;
+          const el = document.createElement('div'); el.className='cart-item';
+          el.innerHTML = `
+            <img src="${it.image}" alt="${it.name}">
+            <div class="grow">
+              <div>${it.name}</div>
+              <div class="small ghost">${it.description||''}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="small ghost">Qty</div>
+              <button class="add-btn" data-action="dec" data-key="${it.id}|${it.variant||''}|${it.name}">−</button>
+              <div style="min-width:24px;text-align:center">${qty}</div>
+              <button class="add-btn" data-action="inc" data-key="${it.id}|${it.variant||''}|${it.name}">+</button>
+            </div>
+            <div class="price">$${((it.price||0)*qty).toFixed(2)}</div>
+            <button class="add-btn" data-action="removeAll" data-key="${it.id}|${it.variant||''}|${it.name}">Remove</button>
+          `;
+          list.appendChild(el);
+        });
+        document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
+        // wire actions
+        list.onclick = function(e){
+          const action = e.target && e.target.dataset && e.target.dataset.action; if(!action) return;
+          const key = e.target.dataset.key; const [id, variant, name] = key.split('|');
+          let c = load();
+          if(action==='inc'){
+            const base = Object.values(groups).find(g=>`${g.item.id}|${g.item.variant||''}|${g.item.name}`===key);
+            if(base){ c.push(base.item); save(c); window.renderCart(); }
+          } else if(action==='dec'){
+            const idx = c.findIndex(x=>x.id===id && (x.variant||'')===variant && x.name===name);
+            if(idx>-1){ c.splice(idx,1); save(c); window.renderCart(); }
+          } else if(action==='removeAll'){
+            c = c.filter(x=>!(x.id===id && (x.variant||'')===variant && x.name===name));
+            save(c); window.renderCart();
+          }
+        };
+      };
+
+      // Larger cart item visuals on cart page
+      (function(){
+        const style = document.createElement('style');
+        style.textContent = `
+          .cart-list .cart-item {padding:12px;border:1px solid rgba(255,255,255,0.06);border-radius:10px}
+          .cart-list .cart-item img {width:84px;height:84px;border-radius:8px;object-fit:cover}
+          .cart-list .cart-item .grow {font-size:1rem}
+          .cart-list .price {font-size:1.1rem}
+        `;
+        document.head.appendChild(style);
+      })();
+      // Wire Proceed to Payment to existing payment page
+      document.addEventListener('DOMContentLoaded', function(){
+        const btn = document.getElementById('proceedPay');
+        if(btn){
+          btn.addEventListener('click', function(){
+            const cart = (function(){ try { return JSON.parse(localStorage.getItem('store_cart_v1'))||[] } catch(e){ return [] } })();
+            if(cart.length === 0){
+              alert('Your cart is empty. Add items first.');
+              return;
+            }
+            location.href = '/Webpages/webpage.html';
+          });
+        }
+        // Ensure initial render on cart page
+        if(window.renderCart) window.renderCart();
+      });
+    </script>
+  </body>
+</html>

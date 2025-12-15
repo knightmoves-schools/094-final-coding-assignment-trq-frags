@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Checkout — Cloud Alts</title>
+        <link rel="stylesheet" href="/assets/styles.css">
+    </head>
+    <body>
+        <div class="container">
+            <div style="max-width:900px;margin:28px auto;display:grid;grid-template-columns:1fr 360px;gap:18px">
+                <section class="card">
+                    <h2>Checkout</h2>
+                    <p class="small ghost">Review your order and enter payment details (demo).</p>
+                    <div id="orderItems" style="margin-top:12px"></div>
+                    <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+                        <div class="small ghost">Total</div>
+                        <div class="price" id="orderTotal">$0.00</div>
+                    </div>
+
+                    <hr style="margin:14px 0">
+                                <h4>Payment details</h4>
+                                <form id="payForm" novalidate>
+                                    <label class="small">Email</label>
+                                    <input id="payEmail" placeholder="you@example.com" style="width:100%;padding:8px;margin:6px 0;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+
+                                    <label class="small">Payment method</label>
+                                    <div style="display:flex;gap:8px;margin-top:8px;margin-bottom:8px" id="payMethods">
+                                        <label><input type="radio" name="method" value="paypal"> PayPal</label>
+                                        <label><input type="radio" name="method" value="venmo"> Venmo</label>
+                                        <label><input type="radio" name="method" value="ltc"> LTC</label>
+                                        <label><input type="radio" name="method" value="card" checked> Card</label>
+                                    </div>
+
+                                    <div id="cardFields">
+                                        <label class="small">Card number</label>
+                                        <input id="cardNum" inputmode="numeric" pattern="\d*" placeholder="4242424242424242" style="width:100%;padding:8px;margin:6px 0;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+                                        <div id="cardNumMsg" class="small" style="color:var(--accent);display:none;margin-top:4px">Numbers only</div>
+                                        <div style="display:flex;gap:8px">
+                                            <div style="flex:1">
+                                                <label class="small">Expiry (MMYY)</label>
+                                                <input id="cardExp" inputmode="numeric" pattern="\d*" placeholder="1225" style="width:100%;padding:8px;margin:6px 0;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+                                                <div id="cardExpMsg" class="small" style="color:var(--accent);display:none;margin-top:4px">Numbers only</div>
+                                            </div>
+                                            <div style="width:120px">
+                                                <label class="small">CVC</label>
+                                                <input id="cardCvc" inputmode="numeric" pattern="\d*" placeholder="123" style="width:100%;padding:8px;margin:6px 0;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+                                                <div id="cardCvcMsg" class="small" style="color:var(--accent);display:none;margin-top:4px">Numbers only</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="ltcFields" style="display:none;margin-top:8px">
+                                        <label class="small">LTC payment proof (TxID)</label>
+                                        <input id="ltcTx" placeholder="Enter LTC transaction ID or audit proof" style="width:100%;padding:8px;margin:6px 0;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+                                        <div class="small ghost">Provide the transaction ID or a short proof string so we can verify the Litecoin payment.</div>
+                                    </div>
+                        <div style="margin-top:12px;display:flex;gap:8px">
+                            <button type="submit" class="cta">Pay now</button>
+                            <a href="./webpage3.html" class="add-btn">Back to store</a>
+                        </div>
+                        <div id="payMsg" class="small ghost" style="margin-top:10px"></div>
+                    </form>
+                </section>
+
+                <aside>
+                    <div class="card">
+                        <h4>Order summary</h4>
+                        <div id="summaryList" style="margin-top:8px"></div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+                            <div class="small ghost">Total</div>
+                            <div class="price" id="summaryTotal">$0.00</div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+
+        <script>
+            // default email server URL — can be overridden in the page before loading assets
+            window.EMAIL_SERVER_URL = window.EMAIL_SERVER_URL || 'http://localhost:3010'
+        </script>
+        <script src="/assets/pay.js"></script>
+        <script src="/assets/scripts.js"></script>
+        <script>
+            // Render order and summary
+            function renderOrder(){
+                const cart = JSON.parse(localStorage.getItem('store_cart_v1')||'[]')
+                const itemsEl = document.getElementById('orderItems')
+                const summaryEl = document.getElementById('summaryList')
+                itemsEl.innerHTML = ''
+                summaryEl.innerHTML = ''
+                let total = 0
+                cart.forEach(it=>{
+                    total += it.price||0
+                    const div = document.createElement('div'); div.style.display='flex'; div.style.justifyContent='space-between'; div.style.marginTop='8px'; div.innerHTML = `<div>${it.name}${it.variant? ' — '+it.variant:''}</div><div class='price'>$${(it.price||0).toFixed(2)}</div>`
+                    itemsEl.appendChild(div)
+                    const s = document.createElement('div'); s.style.display='flex'; s.style.justifyContent='space-between'; s.style.marginTop='6px'; s.innerHTML = `<div class='small ghost'>${it.name}</div><div class='small ghost'>$${(it.price||0).toFixed(2)}</div>`
+                    summaryEl.appendChild(s)
+                })
+                document.getElementById('orderTotal').textContent = `$${total.toFixed(2)}`
+                document.getElementById('summaryTotal').textContent = `$${total.toFixed(2)}`
+            }
+
+            // Payment method toggling and validation
+            const form = document.getElementById('payForm')
+            const payMethods = document.getElementById('payMethods')
+            const cardFields = document.getElementById('cardFields')
+            function updateCardVisibility() {
+                const selected = document.querySelector('input[name="method"]:checked')?.value
+                if (selected === 'card') {
+                    cardFields.style.display = ''
+                    document.getElementById('cardNum').required = true
+                    document.getElementById('cardExp').required = true
+                    document.getElementById('cardCvc').required = true
+                    // LTC field not required when card selected
+                    document.getElementById('ltcTx').required = false
+                    document.getElementById('ltcFields').style.display = 'none'
+                } else {
+                    cardFields.style.display = 'none'
+                    document.getElementById('cardNum').required = false
+                    document.getElementById('cardExp').required = false
+                    document.getElementById('cardCvc').required = false
+                    // show LTC field when ltc selected
+                    if (selected === 'ltc'){
+                        document.getElementById('ltcFields').style.display = ''
+                        document.getElementById('ltcTx').required = true
+                    } else {
+                        document.getElementById('ltcFields').style.display = 'none'
+                        document.getElementById('ltcTx').required = false
+                    }
+                }
+            }
+            payMethods.addEventListener('change', updateCardVisibility)
+            updateCardVisibility()
+
+            form.addEventListener('submit',async (e)=>{
+                e.preventDefault();
+                // clear previous invalid states
+                document.querySelectorAll('.invalid').forEach(n=>n.classList.remove('invalid'))
+                const method = document.querySelector('input[name="method"]:checked')?.value
+                const emailEl = document.getElementById('payEmail')
+                const email = emailEl.value.trim()
+                const cart = JSON.parse(localStorage.getItem('store_cart_v1')||'[]')
+                if(!cart.length){
+                    // mark nothing as invalid, show message
+                    alert('Your cart is empty')
+                    return
+                }
+
+                const invalids = []
+
+                // basic email check
+                if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+                    emailEl.classList.add('invalid')
+                    invalids.push(emailEl)
+                }
+
+                // Card-specific checks
+                if(method === 'card'){
+                    const numEl = document.getElementById('cardNum')
+                    const expEl = document.getElementById('cardExp')
+                    const cvcEl = document.getElementById('cardCvc')
+                    const num = numEl.value.replace(/\s+/g,'')
+                    const exp = expEl.value.replace(/\s+|\//g,'')
+                    const cvc = cvcEl.value.replace(/\s+/g,'')
+                    if(!/^\d{12,19}$/.test(num)) { numEl.classList.add('invalid'); invalids.push(numEl) }
+                    if(!/^\d{4}$/.test(exp)) { expEl.classList.add('invalid'); invalids.push(expEl) }
+                    if(!/^\d{3,4}$/.test(cvc)) { cvcEl.classList.add('invalid'); invalids.push(cvcEl) }
+                }
+
+                // LTC-specific checks
+                if(method === 'ltc'){
+                    const txEl = document.getElementById('ltcTx')
+                    const tx = (txEl.value||'').trim()
+                    if(!tx){ txEl.classList.add('invalid'); invalids.push(txEl) }
+                }
+
+                if(invalids.length){
+                    // focus first invalid and do not proceed
+                    invalids[0].focus()
+                    return
+                }
+
+                document.getElementById('payMsg').textContent = 'Processing…'
+                const amount = cart.reduce((s,i)=>s+(i.price||0),0)
+                try{
+                    const res = await submitPayment({email,amount,items:cart,method})
+                    if(res && res.ok){ document.getElementById('payMsg').textContent = 'Payment success — order '+res.orderId; setTimeout(()=>location.href='/customers/dashboard.html',900) }
+                    else document.getElementById('payMsg').textContent = 'Payment failed'
+                }catch(err){
+                    console.error(err)
+                    document.getElementById('payMsg').textContent = 'Payment error'
+                }
+            })
+
+            // Show inline 'Numbers only' when user types non-digit characters
+            function wireNumbersOnly(id, msgId) {
+                const el = document.getElementById(id)
+                const msg = document.getElementById(msgId)
+                el.addEventListener('input', ()=>{
+                    const v = el.value
+                    if (/[A-Za-z]/.test(v)) {
+                        msg.style.display = ''
+                    } else {
+                        msg.style.display = 'none'
+                    }
+                })
+            }
+            wireNumbersOnly('cardNum','cardNumMsg')
+            wireNumbersOnly('cardExp','cardExpMsg')
+            wireNumbersOnly('cardCvc','cardCvcMsg')
+
+            // Luhn algorithm for card validation
+            function luhnCheck(num){
+                const arr = num.split('').reverse().map(x=>parseInt(x,10))
+                let sum = 0
+                for(let i=0;i<arr.length;i++){
+                    let v = arr[i]
+                    if(i%2===1){ v = v*2; if(v>9) v -= 9 }
+                    sum += v
+                }
+                return sum % 10 === 0
+            }
+
+            // format card number as groups of 4
+            function formatCardNumber(v){
+                return v.replace(/\D/g,'').slice(0,19).replace(/(.{4})/g,'$1 ').trim()
+            }
+
+            const cardNumEl = document.getElementById('cardNum')
+            const cardExpEl = document.getElementById('cardExp')
+            const cardCvcEl = document.getElementById('cardCvc')
+
+            // Live formatting and validation for card number
+            cardNumEl.addEventListener('input', ()=>{
+                const raw = cardNumEl.value
+                const formatted = formatCardNumber(raw)
+                if(formatted !== raw) cardNumEl.value = formatted
+                const digits = cardNumEl.value.replace(/\s+/g,'')
+                if(/^\d{12,19}$/.test(digits) && luhnCheck(digits)){
+                    cardNumEl.classList.remove('invalid'); cardNumEl.classList.add('valid')
+                } else {
+                    cardNumEl.classList.remove('valid')
+                    // if contains letters show invalid immediately
+                    if(/[A-Za-z]/.test(cardNumEl.value)) cardNumEl.classList.add('invalid')
+                    else cardNumEl.classList.remove('invalid')
+                }
+            })
+
+            // Expiry accepts MMYY or MM/YY and validates month and future date
+            function parseExpiry(v){
+                const cleaned = v.replace(/\s|\//g,'')
+                if(!/^\d{4}$/.test(cleaned)) return null
+                const mm = parseInt(cleaned.slice(0,2),10)
+                const yy = parseInt(cleaned.slice(2,4),10)
+                if(mm < 1 || mm > 12) return null
+                // create a date at end of month
+                const year = 2000 + yy
+                const monthIndex = mm - 1
+                const d = new Date(year, monthIndex + 1, 0)
+                return {month: mm, year, lastDay: d}
+            }
+
+            cardExpEl.addEventListener('input', ()=>{
+                const v = cardExpEl.value
+                // don't reformat aggressively, just remove letters
+                if(/[A-Za-z]/.test(v)) cardExpEl.classList.add('invalid')
+                else cardExpEl.classList.remove('invalid')
+                const parsed = parseExpiry(v)
+                if(parsed){
+                    const now = new Date(); now.setHours(0,0,0,0)
+                    if(parsed.lastDay >= now){ cardExpEl.classList.remove('invalid'); cardExpEl.classList.add('valid') }
+                    else { cardExpEl.classList.remove('valid'); cardExpEl.classList.add('invalid') }
+                } else {
+                    cardExpEl.classList.remove('valid')
+                }
+            })
+
+            // CVC live validation
+            cardCvcEl.addEventListener('input', ()=>{
+                const v = cardCvcEl.value.replace(/\s+/g,'')
+                if(/^[0-9]{3,4}$/.test(v)) { cardCvcEl.classList.remove('invalid'); cardCvcEl.classList.add('valid') }
+                else { cardCvcEl.classList.remove('valid'); if(/[A-Za-z]/.test(cardCvcEl.value)) cardCvcEl.classList.add('invalid') }
+            })
+
+            renderOrder()
+        </script>
+    </body>
+</html>

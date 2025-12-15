@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Receipt</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    @media print{ .no-print{display:none} }
+    .receipt{max-width:760px;margin:20px auto;padding:18px;background:var(--card);border-radius:10px}
+    .receipt h2{margin:0}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="receipt card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 id="rTitle">Receipt</h2>
+          <div id="rDate" class="small ghost"></div>
+        </div>
+        <div>
+          <button class="add-btn no-print" onclick="window.history.back()">Back</button>
+          <button class="cta no-print" id="printBtn">Download PDF</button>
+        </div>
+      </div>
+      <hr style="margin:12px 0">
+      <div id="rBody"></div>
+    </div>
+  </div>
+
+  <script>
+    function qs(sel){return document.querySelector(sel)}
+    function getQuery(){ const q = location.search.substring(1); return Object.fromEntries(new URLSearchParams(q)) }
+    const q = getQuery(); const id = q.id
+    try{
+      const orders = JSON.parse(localStorage.getItem('demo_orders_v1')||'[]')
+      const o = orders.find(x=>x.id===id)
+      if(!o){ qs('#rBody').innerHTML = '<div class="small ghost">Order not found</div>'; }
+      else{
+        qs('#rDate').textContent = new Date(o.created).toLocaleString()
+        let html = `<div><strong>Order ${o.id}</strong></div><div class='small ghost'>Email: ${o.email || (o.userEmail||'')}</div><div style="margin-top:12px"><table style='width:100%'><tbody>`
+        o.items.forEach(i=>{ html += `<tr><td>${i.name}${i.variant? ' ('+i.variant+')':''}</td><td style='text-align:right'>$${(i.price||0).toFixed(2)}</td></tr>` })
+        html += `</tbody></table></div><div style='display:flex;justify-content:space-between;margin-top:12px'><div class='small ghost'>Total</div><div class='price'>$${(o.amount||0).toFixed(2)}</div></div>`
+        qs('#rBody').innerHTML = html
+      }
+    }catch(e){ qs('#rBody').innerHTML = '<div class="small ghost">Error loading receipt</div>' }
+    qs('#printBtn').addEventListener('click',()=>{ window.print() })
+  </script>
+</body>
+</html>
